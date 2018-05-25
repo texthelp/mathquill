@@ -83,6 +83,7 @@ LatexCmds.overrightarrow = bind(Style, '\\overrightarrow', 'span', 'class="mq-no
 LatexCmds.overleftarrow = bind(Style, '\\overleftarrow', 'span', 'class="mq-non-leaf mq-overarrow mq-arrow-left"');
 LatexCmds.overleftrightarrow = bind(Style, '\\overleftrightarrow', 'span', 'class="mq-non-leaf mq-overarrow mq-arrow-both"');
 LatexCmds.overarc = bind(Style, '\\overarc', 'span', 'class="mq-non-leaf mq-overarc"');
+LatexCmds.cancel = bind(Style, '\\cancel', 'span', 'class="mq-non-leaf mq-cancel"'); 
 LatexCmds.dot = P(MathCommand, function(_, super_) {
     _.init = function() {
         super_.init.call(this, '\\dot', '<span class="mq-non-leaf"><span class="mq-dot-recurring-inner">'

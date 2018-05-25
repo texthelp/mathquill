@@ -1173,7 +1173,10 @@ Environments.matrix = P(Environment, function(_, super_) {
     }
     this.finalizeTree();
   };
-  _.addRow = function(afterCell) {
+  _.duplicateRow = function(afterCell) {
+    return this.addRow(afterCell, true);
+  };
+  _.addRow = function(afterCell, duplicatePreviousRow) {
     var previous = [], newCells = [], next = [];
     var newRow = $('<tr></tr>'), row = afterCell.row;
     var columns = 0, block, column;
@@ -1195,16 +1198,35 @@ Environments.matrix = P(Environment, function(_, super_) {
       }
     });
 
+    // Get an array of cells from the previous row
+    var previousRowCells = previous.filter(function(cell) {
+      return cell.row === row;
+    });
+
     // Add new cells, one for each column
     var isFirstColumn = true;
     for (var i=0; i<columns; i+=1) {
       block = MatrixCell(row+1);
+      // If we're duplicating the previous row, we should
+      // create a clone of the children from that cell and append it to the current
+      if(duplicatePreviousRow === true) {
+        var fragment = latexMathParser.parse(previousRowCells[i].latex());
+        fragment.children().adopt(block, block.ends[L], 0);
+      }
       block.parent = this;
       newCells.push(block);
       isFirstColumn = false;
       // Create cell <td>s and add to new row
-      block.jQ = $('<td class="mq-empty">')
-        .attr(mqBlockId, block.id)
+      var td = block.jQ = $('<td>');
+      // If we're duplicating the previous row, create the jQuery children
+      if(duplicatePreviousRow === true) {
+        td.append(fragment.jQize());
+      }
+      // Otherwise flag the cell as being empty
+      else {
+        td.attr("class", "mq-empty");
+      }
+      td.attr(mqBlockId, block.id)
         .appendTo(newRow);
     }
 
@@ -1349,6 +1371,9 @@ var MatrixCell = P(MathBlock, function(_, super_) {
       break;
     case 'Shift-Enter':
     return this.parent.insert('addRow', this);
+      break;
+    case 'Ctrl-Shift-Enter':
+      return this.parent.insert('duplicateRow', this);
       break;
     }
     return super_.keystroke.apply(this, arguments);

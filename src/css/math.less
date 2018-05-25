@@ -379,11 +379,46 @@
     margin-left: 0.1em;
     margin-right: 0.1em;
 
+    table tbody td {
+      &.mq-array-align-l {
+        text-align: left;
+      }
+      &.mq-array-align-c {
+        text-align: center;
+      }
+      &.mq-array-align-r {
+        text-align: right;
+      }
+      &.mq-array-border-l {
+        border-left: 1px solid #000;
+      }
+      &.mq-array-border-r {
+        border-right: 1px solid #000;
+      }
+    }
+
+    /* In LaTeX environments, there is no border spacing
+     * so the borders join up.
+     */
+    &.mq-array-table {
+      table {
+        border-spacing: 0;
+        border-collapse: collapse;
+
+        /* In place of this, we add some more padding to the
+         * cells to give more space */
+        td {
+          padding: 0.3em 0.5em;
+        }
+      }
+    }
+
     table {
       width: auto;
       border-bottom: none;
       border-spacing: 3px;
       border-collapse: separate;
+
       &.mq-rows-1 { /* better alignment when there's just one row */
         vertical-align: middle;
         margin-bottom: 1px;

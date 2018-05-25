@@ -289,7 +289,7 @@ x+\class{testclass}{y}+z
 
 <p>Mutiple consecutive spaces in the middle of a text mode block should not collapse into one space: <span class="mathquill-static-math">\text{three   spaces}</span></p>
 
-<h3>Matrix align* environments</h3>
+<h3>Tabular align* environments</h3>
 <p>align* environments should render with each row's = sign aligned, the LHS aligned right, and the RHS aligned left
   <span class="mathquill-static-math">
     \begin{align*}
@@ -307,6 +307,29 @@ x+\class{testclass}{y}+z
     \end{align*}
   </span>
 </p>
+
+<h3>Tabular array environments</h3>
+<p>array environments render similar to the align environment above, but they take an explicit parameter defining the alignment of the cells:</p>
+  <span class="mathquill-static-math">
+    \begin{array}{rcl}
+    x &amp; y &amp; z \\
+    111111 &amp; 111111 &amp; 1111
+    \end{array}
+  </span>
+<p>They can also take a pipe character indicating a border around the cells</p>
+  <span class="mathquill-static-math">
+    \begin{array}{|rlc|l|}
+    a &amp; b &amp; c &amp; d \\
+    a &amp; b &amp; c &amp; d
+    \end{array}
+  </span>
+  <p>The last parameter in the alignment option repeats for the rest of the cells in the row</p>
+  <span class="mathquill-static-math">
+    \begin{array}{lcr}
+    a &amp; b &amp; c &amp; d &amp; e &amp; f \\
+    11111 &amp; 11111 &amp; 11111 &amp; 11111 &amp; 11111 &amp; 11111
+    \end{array}
+  </span>
 
 </div>
 <script type="text/javascript">

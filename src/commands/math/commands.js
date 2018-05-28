@@ -1240,7 +1240,10 @@ var TabularEnv = P(Environment, function(_, super_) {
       }
       // Otherwise flag the cell as being empty
       else {
-        td.attr("class", "mq-empty");
+        td.addClass("mq-empty");
+      }
+      if(this.environment === "array" || this.environment === "tabular") {
+        td.addClass(this.getCellAlignmentClass(i));
       }
       td.attr(mqBlockId, block.id)
         .appendTo(newRow);

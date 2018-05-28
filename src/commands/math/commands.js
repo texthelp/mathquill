@@ -94,6 +94,20 @@ LatexCmds.dot = P(MathCommand, function(_, super_) {
         );
     };
 });
+LatexCmds.stackrel = P(MathCommand, function(_, super_) { 
+  _.ctrlSeq = '\\stackrel'; 
+  _.htmlTemplate = 
+      '<span class="mq-stackrel mq-non-leaf">' 
+    +   '<span class="mq-stackrel-top">&0</span>' 
+    +   '<span class="mq-stackrel-bottom">&1</span>' 
+    + '</span>' 
+  ; 
+  _.textTemplate = ['(', ')/(', ')']; 
+  _.finalizeTree = function() { 
+    this.upInto = this.ends[R].upOutOf = this.ends[L]; 
+    this.downInto = this.ends[L].downOutOf = this.ends[R]; 
+  }; 
+}); 
 
 // `\textcolor{color}{math}` will apply a color to the given math content, where
 // `color` is any valid CSS Color Value (see [SitePoint docs][] (recommended),

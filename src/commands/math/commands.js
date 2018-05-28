@@ -937,8 +937,10 @@ var TabularEnv = P(Environment, function(_, super_) {
       rows[i].splice(column, 0, block);
 
       block.jQ = $('<td class="mq-empty">')
-        .attr(mqBlockId, block.id)
-        .addClass(this.getCellAlignmentClass(rows[i].length));
+        .attr(mqBlockId, block.id);
+      if(this.getCellAlignmentClass) {
+        block.jQ.addClass(this.getCellAlignmentClass(rows[i].length));
+      }
     }
 
     // Add cell <td> elements in correct positions

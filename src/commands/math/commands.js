@@ -1257,12 +1257,12 @@ var TabularEnv = P(Environment, function(_, super_) {
     this.blocks = previous.concat(newCells, next);
 ;    return newCells[column];
   };
-  _.insert = function(method, afterCell) {
+  _.insert = function(method, afterCell, cursor) {
     if (this[method]) {
       var cellToFocus = this[method](afterCell);
-      this.cursor = this.cursor || this.parent.cursor;
       this.finalizeTree();
-      this.bubble('reflow').cursor.insAtRightEnd(cellToFocus);
+      this.bubble('reflow');
+      cursor.insAtRightEnd(cellToFocus);
     }
   };
   _.backspace = function(cell, dir, cursor, finalDeleteCallback) {
@@ -1581,13 +1581,13 @@ var TabularCell = P(MathBlock, function(_, super_) {
     switch (key) {
     case 'Shift-Spacebar':
       e.preventDefault();
-      return this.parent.insert('addColumn', this);
+      return this.parent.insert('addColumn', this, ctrlr.cursor);
       break;
     case 'Shift-Enter':
-    return this.parent.insert('addRow', this);
+      return this.parent.insert('addRow', this, ctrlr.cursor);
       break;
     case 'Ctrl-Shift-Enter':
-      return this.parent.insert('duplicateRow', this);
+      return this.parent.insert('duplicateRow', this, ctrlr.cursor);
       break;
     }
     return super_.keystroke.apply(this, arguments);

@@ -937,7 +937,8 @@ var TabularEnv = P(Environment, function(_, super_) {
       rows[i].splice(column, 0, block);
 
       block.jQ = $('<td class="mq-empty">')
-        .attr(mqBlockId, block.id);
+        .attr(mqBlockId, block.id)
+        .addClass(this.getCellAlignmentClass(rows[i].length));
     }
 
     // Add cell <td> elements in correct positions
@@ -1252,7 +1253,7 @@ var TabularEnv = P(Environment, function(_, super_) {
     // Insert the new row
     this.jQ.find('tr').eq(row).after(newRow);
     this.blocks = previous.concat(newCells, next);
-    return newCells[column];
+;    return newCells[column];
   };
   _.insert = function(method, afterCell) {
     if (this[method]) {

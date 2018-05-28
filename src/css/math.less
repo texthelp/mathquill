@@ -50,7 +50,7 @@
 
   .mq-text-mode {
     display: inline-block;
-    white-space: pre;  
+    white-space: pre;
   }
 
   .mq-text-mode.mq-hasCursor {
@@ -311,7 +311,7 @@
     display: block;
     text-align: center;
   }
-  
+
   .mq-hat-prefix {
     display: block;
     text-align: center;
@@ -416,4 +416,38 @@
       }
     }
   }
+
+  .mq-matrix {
+    vertical-align: middle;
+    margin-left: 0.1em;
+    margin-right: 0.1em;
+
+    table {
+      width: auto;
+      border-bottom: none;
+      border-spacing: 3px;
+      border-collapse: separate;
+      &.mq-rows-1 { /* better alignment when there's just one row */
+        vertical-align: middle;
+        margin-bottom: 1px;
+      }
+
+      &.mq-align {
+        td:nth-child(odd) {
+          text-align: right;
+        }
+        td:nth-child(even) {
+          text-align: left;
+        }
+      }
+    }
+
+    td {
+      border: none;
+      width: auto; /* defensive resets */
+      padding: 0.1em 0.3em;
+      vertical-align: baseline;
+    }
+  }
+
 }

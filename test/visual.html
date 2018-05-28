@@ -294,8 +294,8 @@ x+\class{testclass}{y}+z
 
 <p>Mutiple consecutive spaces in the middle of a text mode block should not collapse into one space: <span class="mathquill-static-math">\text{three   spaces}</span></p>
 
-<h3>Matrix align* environments</h3>
-<p>align* environments should render in a similar manner to matrix environments, except their cell alignment occurs in the order {rlrlrlrl...}</p>
+<h3>Tabular align* environments</h3>
+<p>align* environments should render in a similar manner to matrix environments, except their cell alignment occurs in the order {rlrlrlrl...}
     <span class="mathquill-static-math">
         \begin{align*}
 \frac{3x + y}{7} &amp;&amp;= 9  &amp;&amp; \text{given}   \\
@@ -326,6 +326,29 @@ x &amp;&amp;= 21 - \frac{y}{3}  &amp;&amp; \text{divide by 3}   \\
      \end{align*}
   </span>
 </p>
+
+<h3>Tabular array environments</h3>
+<p>array environments render similar to the align environment above, but they take an explicit parameter defining the alignment of the cells:</p>
+  <span class="mathquill-static-math">
+    \begin{array}{rcl}
+    x &amp; y &amp; z \\
+    111111 &amp; 111111 &amp; 1111
+    \end{array}
+  </span>
+<p>They can also take a pipe character indicating a border around the cells</p>
+  <span class="mathquill-static-math">
+    \begin{array}{|rlc|l|}
+    a &amp; b &amp; c &amp; d \\
+    a &amp; b &amp; c &amp; d
+    \end{array}
+  </span>
+  <p>The last parameter in the alignment option repeats for the rest of the cells in the row</p>
+  <span class="mathquill-static-math">
+    \begin{array}{lcr}
+    a &amp; b &amp; c &amp; d &amp; e &amp; f \\
+    11111 &amp; 11111 &amp; 11111 &amp; 11111 &amp; 11111 &amp; 11111
+    \end{array}
+  </span>
 
 </div>
 <script type="text/javascript">

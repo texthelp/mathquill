@@ -896,62 +896,66 @@ var Environment = P(MathCommand, function(_, super_) {
   };
 });
 
-var Matrix =
-Environments.matrix = P(Environment, function(_, super_) {
-
+// An 'abstract' environment extended by matrix and align*
+var TabularEnv = P(Environment, function(_, super_) {
   _.delimiters = {
     column: '&',
     row: '\\\\'
   };
-  _.parentheses = {
-    left: null,
-    right: null
-  };
-  _.environment = 'matrix';
+  _.addColumn = function(afterCell) {
+    var rows = [], newCells = [];
+    var column, block;
 
-  _.removeEmptyColumns = true;  // Default to removing empty columns on deleting cell.
-  _.removeEmptyRows = true;  // Default to removing empty rows on deleting the last cell.
+    // Build rows array and find new column index
+    this.eachChild(function (cell) {
+      rows[cell.row] = rows[cell.row] || [];
+      rows[cell.row].push(cell);
+      if (cell === afterCell) column = rows[cell.row].length;
+    });
 
-  _.reflow = function() {
-    var blockjQ = this.jQ.children('table');
+    // Add new cells, one for each row
+    for (var i=0; i<rows.length; i+=1) {
+      block = TabularCell(i);
+      block.parent = this;
+      newCells.push(block);
+      rows[i].splice(column, 0, block);
 
-    var height = blockjQ.outerHeight()/+blockjQ.css('fontSize').slice(0,-2);
-
-    var parens = this.jQ.children('.mq-paren');
-    if (parens.length) {
-      scale(parens, min(1 + .2*(height - 1), 1.2), 1.05*height);
+      block.jQ = $('<td class="mq-empty">')
+        .attr(mqBlockId, block.id);
     }
+
+    // Add cell <td> elements in correct positions
+    this.jQ.find('tr').each(function (i) {
+      $(this).find('td').eq(column-1).after(rows[i][column].jQ);
+    });
+
+    // Flatten the rows array-of-arrays
+    this.blocks = [].concat.apply([], rows);
+    return newCells[afterCell.row];
   };
   _.latex = function() {
+    var delimiters = this.delimiters;
     var latex = '';
     var row;
 
     this.eachChild(function (cell) {
       if (typeof row !== 'undefined') {
         latex += (row !== cell.row) ?
-          this.delimiters.row :
-          this.delimiters.column;
+          delimiters.row :
+          delimiters.column;
       }
       row = cell.row;
       latex += cell.latex();
-    }.bind(this));
+    });
 
     return this.wrappers().join(latex);
   };
-  _.html = function() {
+  _.tableHtml = function() {
     var cells = [], trs = '', i=0, row;
-
-    function parenHtml(paren) {
-      return (paren) ?
-          '<span class="mq-scaled mq-paren">'
-        +   paren
-        + '</span>' : '';
-    }
 
     // Build <tr><td>.. structure from cells
     this.eachChild(function (cell) {
-      var isFirstColumn = row !== cell.row;
-      if (isFirstColumn) {
+      if (row !== cell.row) {
         row = cell.row;
         trs += '<tr>$tds</tr>';
         cells[row] = [];
@@ -959,39 +963,23 @@ Environments.matrix = P(Environment, function(_, super_) {
       cells[row].push('<td>&'+(i++)+'</td>');
     });
 
-    var tableClasses = this.extraTableClasses ? 'mq-non-leaf ' + this.extraTableClasses : 'mq-non-leaf';
-
-    this.htmlTemplate =
-        '<span class="mq-matrix mq-non-leaf">'
-      +   parenHtml(this.parentheses.left)
-      +   '<table class="' + tableClasses + '">'
-      +     trs.replace(/\$tds/g, function () {
-              return cells.shift().join('');
-            })
-      +   '</table>'
-      +   parenHtml(this.parentheses.right)
-      + '</span>'
-    ;
-
-    return super_.html.call(this);
-  };
-  // Create default 4-cell matrix
-  _.createBlocks = function() {
-    this.blocks = [
-      MatrixCell(0, this),
-      MatrixCell(0, this),
-      MatrixCell(1, this),
-      MatrixCell(1, this)
-    ];
+    return (
+        '<table class="mq-non-leaf">'
+      +   trs.replace(/\$tds/g, function () {
+            return cells.shift().join('');
+          })
+      + '</table>'
+    );
   };
   _.parser = function() {
     var self = this;
+    var delimiters = this.delimiters;
     var optWhitespace = Parser.optWhitespace;
     var string = Parser.string;
 
     return optWhitespace
-    .then(string(this.delimiters.column)
-      .or(string(this.delimiters.row))
+    .then(string(delimiters.column)
+      .or(string(delimiters.row))
       .or(latexMathParser.block))
     .many()
     .skip(optWhitespace)
@@ -1001,7 +989,7 @@ Environments.matrix = P(Environment, function(_, super_) {
       self.blocks = [];
 
       function addCell() {
-        self.blocks.push(MatrixCell(row, self, blocks));
+        self.blocks.push(TabularCell(row, self, blocks));
         blocks = [];
       }
 
@@ -1010,7 +998,7 @@ Environments.matrix = P(Environment, function(_, super_) {
           blocks.push(items[i]);
         } else {
           addCell();
-          if (items[i] === self.delimiters.row) row+=1;
+          if (items[i] === delimiters.row) row+=1;
         }
       }
       addCell();
@@ -1056,7 +1044,6 @@ Environments.matrix = P(Environment, function(_, super_) {
     var entryPoint = updown && this.getEntryPoint(dir, cursor, updown);
     cursor.insAtDirEnd(-dir, entryPoint || this.ends[-dir]);
   };
-
   // Set up directional pointers between cells
   _.relink = function() {
     var blocks = this.blocks;
@@ -1101,7 +1088,7 @@ Environments.matrix = P(Environment, function(_, super_) {
     this.ends[R] = blocks[blocks.length-1];
   };
   // Ensure consistent row lengths
-  _.autocorrect = function(rows) {
+  _.autocorrect = function() {
     var lengths = [], rows = [];
     var blocks = this.blocks;
     var maxLength, shortfall, position, row, i;
@@ -1120,7 +1107,7 @@ Environments.matrix = P(Environment, function(_, super_) {
         shortfall = maxLength - rows[i].length;
         while (shortfall) {
           position = maxLength*i + rows[i].length;
-          blocks.splice(position, 0, MatrixCell(i, this));
+          blocks.splice(position, 0, TabularCell(i, this));
           shortfall-=1;
         }
       }
@@ -1169,7 +1156,7 @@ Environments.matrix = P(Environment, function(_, super_) {
       }
     }
 
-    if (_.removeEmptyRows && isEmpty(myRow) && myColumn.length > 1) {
+    if (isEmpty(myRow) && myColumn.length > 1) {
       row = rows.indexOf(myRow);
       // Decrease all following row numbers
       this.eachChild(function (cell) {
@@ -1179,7 +1166,7 @@ Environments.matrix = P(Environment, function(_, super_) {
       remove(myRow);
       this.jQ.find('tr').eq(row).remove();
     }
-    if (_.removeEmptyColumns && isEmpty(myColumn) && myRow.length > 1) {
+    if (this.removeEmptyColumns && isEmpty(myColumn) && myRow.length > 1) {
       remove(myColumn);
     }
     this.finalizeTree();
@@ -1215,9 +1202,8 @@ Environments.matrix = P(Environment, function(_, super_) {
     });
 
     // Add new cells, one for each column
-    var isFirstColumn = true;
     for (var i=0; i<columns; i+=1) {
-      block = MatrixCell(row+1);
+      block = TabularCell(row+1);
       // If we're duplicating the previous row, we should
       // create a clone of the children from that cell and append it to the current
       if(duplicatePreviousRow === true) {
@@ -1226,6 +1212,9 @@ Environments.matrix = P(Environment, function(_, super_) {
       }
       block.parent = this;
       newCells.push(block);
+      if (this.htmlColumnSeparator && !isFirstColumn) {
+        newRow.append($(this.htmlColumnSeparator));
+      }
       isFirstColumn = false;
       // Create cell <td>s and add to new row
       var td = block.jQ = $('<td>');
@@ -1246,42 +1235,13 @@ Environments.matrix = P(Environment, function(_, super_) {
     this.blocks = previous.concat(newCells, next);
     return newCells[column];
   };
-  _.addColumn = function(afterCell) {
-    var rows = [], newCells = [];
-    var column, block;
-
-    // Build rows array and find new column index
-    this.eachChild(function (cell) {
-      rows[cell.row] = rows[cell.row] || [];
-      rows[cell.row].push(cell);
-      if (cell === afterCell) column = rows[cell.row].length;
-    });
-
-    // Add new cells, one for each row
-    for (var i=0; i<rows.length; i+=1) {
-      block = MatrixCell(i);
-      block.parent = this;
-      newCells.push(block);
-      rows[i].splice(column, 0, block);
-
-      block.jQ = $('<td class="mq-empty">')
-        .attr(mqBlockId, block.id);
-    }
-
-    // Add cell <td> elements in correct positions
-    this.jQ.find('tr').each(function (i) {
-      $(this).find('td').eq(column-1).after(rows[i][column].jQ);
-    });
-
-    // Flatten the rows array-of-arrays
-    this.blocks = [].concat.apply([], rows);
-    return newCells[afterCell.row];
-  };
   _.insert = function(method, afterCell) {
-    var cellToFocus = this[method](afterCell);
-    this.cursor = this.cursor || this.parent.cursor;
-    this.finalizeTree();
-    this.bubble('reflow').cursor.insAtRightEnd(cellToFocus);
+    if (this[method]) {
+      var cellToFocus = this[method](afterCell);
+      this.cursor = this.cursor || this.parent.cursor;
+      this.finalizeTree();
+      this.bubble('reflow').cursor.insAtRightEnd(cellToFocus);
+    }
   };
   _.backspace = function(cell, dir, cursor, finalDeleteCallback) {
     var dirwards = cell[dir];
@@ -1301,6 +1261,52 @@ Environments.matrix = P(Environment, function(_, super_) {
       }
       this.bubble('edited');
     }
+  };
+});
+
+var Matrix =
+Environments.matrix = P(TabularEnv, function(_, super_) {
+  _.environment = 'matrix';
+  _.removeEmptyColumns = true;
+  _.parentheses = {
+    left: '',
+    right: ''
+  };
+  _.reflow = function() {
+    var blockjQ = this.jQ.children('table');
+
+    var height = blockjQ.outerHeight()/+blockjQ.css('fontSize').slice(0,-2);
+
+    var parens = this.jQ.children('.mq-paren');
+    if (parens.length) {
+      scale(parens, min(1 + .2*(height - 1), 1.2), 1.05*height);
+    }
+  };
+  _.html = function () {
+    function parenHtml(paren) {
+      return (paren) ?
+          '<span class="mq-scaled mq-paren">'
+        +   paren
+        + '</span>' : '';
+    }
+
+    this.htmlTemplate =
+        '<span class="mq-tabular mq-non-leaf">'
+      +   parenHtml(this.parentheses.left)
+      +   this.tableHtml()
+      +   parenHtml(this.parentheses.right)
+      + '</span>'
+    ;
+
+    return super_.html.call(this);
+  };
+  _.createBlocks = function() {
+    this.blocks = [
+      TabularCell(0, this),
+      TabularCell(0, this),
+      TabularCell(1, this),
+      TabularCell(1, this)
+    ];
   };
 });
 
@@ -1345,23 +1351,177 @@ Environments.Vmatrix = P(Matrix, function(_, super_) {
 });
 
 // An environment for aligning equations that translates well enough to amsmath align*.
-// This is inheriting from Matrix for implementation purposes only, it is a more restrictive design
-// allowing only three columns, the middle of which is just the '=' sign, and is represented slightly
-// differently in latex. Nevertheless, we want it to render as a table so it's convenient to extend Matrix.
-Environments['align*'] = P(Matrix, function (_, super_) {
+// Similar to matrix, but with a strict set of alignment rules
+Environments['align*'] = P(TabularEnv, function(_, super_) {
   _.environment = 'align*';
-  _.extraTableClasses = 'mq-align';
+  _.removeEmptyColumns = true;
   _.createBlocks = function() {
     this.blocks = [
-      MatrixCell(0, this),
-      MatrixCell(0, this),
+      TabularCell(0, this),
+      TabularCell(0, this)
     ];
-  }
+  };
+  _.html = function () {
+    this.htmlTemplate =
+        '<span class="mq-tabular mq-align mq-non-leaf">'
+      +   this.tableHtml()
+      + '</span>'
+    ;
+
+    return super_.html.call(this);
+  };
 });
 
-// Replacement for mathblocks inside matrix cells
-// Adds matrix-specific keyboard commands
-var MatrixCell = P(MathBlock, function(_, super_) {
+Environments.tabular = 
+Environments.array = P(TabularEnv, function(_, super_) {
+  _.environment = 'array';
+  _.removeEmptyColumns = false;
+  _.createBlocks = function() {
+    this.blocks = [
+      TabularCell(0, this)
+    ];
+  };
+  _.html = function () {
+    this.htmlTemplate =
+        '<span class="mq-tabular mq-array-table mq-non-leaf">'
+      +   this.tableHtml()
+      + '</span>'
+    ;
+
+    return super_.html.call(this);
+  };
+  _.getAlignment = function(cellNumber) {
+    if(cellNumber < 0 || cellNumber > this.cellAlignment.length - 1) {
+      return this.cellAlignment[this.cellAlignment.length - 1] || { align: 'l' };
+    }
+    return this.cellAlignment[cellNumber] || { align: 'l' };
+  };
+  _.getCellAlignmentClass = function(cellNumber) {
+    var alignment = this.getAlignment(cellNumber);
+    var className = 'mq-array-align-'+alignment.align;
+    if(alignment.leftBorder) {
+      className += " mq-array-border-l";
+    }
+    if(alignment.rightBorder) {
+      className += " mq-array-border-r";
+    }
+    return className;
+  };
+  _.tableHtml = function() {
+    var cells = [], trs = '', i=0, row;
+    var self = this;
+
+    // Build <tr><td>.. structure from cells
+    this.eachChild(function (cell) {
+      if (row !== cell.row) {
+        row = cell.row;
+        trs += '<tr>$tds</tr>';
+        cells[row] = [];
+      }
+      cells[row].push('<td class="' + self.getCellAlignmentClass(cells[row].length) + '">&'+(i++)+'</td>');
+    });
+
+    return (
+        '<table class="mq-non-leaf">'
+      +   trs.replace(/\$tds/g, function () {
+            return cells.shift().join('');
+          })
+      + '</table>'
+    );
+  };
+  _.parseAlignment = function(alignment) {
+    // Ensure the parameter is a string without whitepsace
+    var alignmentString = (alignment || "").toString().trim();
+    var results = [];
+    var current = {};
+    // Iterate the string in sequence, it should be in the format:
+    // lcrlcrlrclll....N
+    // With optional pipe characters indicating the cell should have a border:
+    // e.g. |lcr|l|cr|
+    for(var i=0; i<alignmentString.length; i++) {
+      var char = alignmentString.charAt(i);
+      if(char === '|') {
+        // If the current character is a pipe character at the end
+        // of the string, we should give the cell a right border
+        if(i === alignmentString.length - 1) {
+          current.rightBorder = true;
+          results.push(current);
+          return results;
+        }
+        // Otherwise, we should flag the current cell as having a
+        // left border
+        if(!current.leftBorder) {
+          current.leftBorder = true;
+        }
+        continue;
+      }
+      // Set the alignment flag to the current character, which will be either a
+      // 'l', 'c' or an 'r'
+      current.align = char;
+      // If there are more characters in the string and or the next character is not
+      // a pipe at the end of the string, we should 'commit' this character sequence
+      // to the alignment results
+      if(i < alignmentString.length - 2 || alignmentString.charAt(i + 1) !== '|') {
+        results.push(current);
+        current = {};
+      }
+    }
+    // At this point we'll have an array which describes the alignment for each cell,
+    // include whether or not it has a left or right border
+    return results;
+  };
+  // Tabular/array environments take a secondary parameter which
+  // defines the cell alignment for the current environment
+  _.parser = function() {
+    var self = this;
+    var delimiters = this.delimiters;
+    var optWhitespace = Parser.optWhitespace;
+    var string = Parser.string;
+    var regex = Parser.regex;
+
+    return optWhitespace
+    .then(string('{'))
+    .then(regex(/^[ |lcr]*/))
+    .skip(string('}'))
+    .then(function(alignmentParameter) {
+      // Store the cell alignment against the current environment
+      // All rows will inherit this order
+      self.cellAlignment = self.parseAlignment(alignmentParameter);
+      return optWhitespace
+        .then(string(self.delimiters.column)
+        .or(string(self.delimiters.row))
+        .or(latexMathParser.block))
+        .many();
+    })
+    .skip(optWhitespace)
+    .then(function(items) {
+      var blocks = [];
+      var row = 0;
+      self.blocks = [];
+
+      function addCell() {
+        self.blocks.push(TabularCell(row, self, blocks));
+        blocks = [];
+      }
+
+      for (var i=0; i<items.length; i+=1) {
+        if (items[i] instanceof MathBlock) {
+          blocks.push(items[i]);
+        } else {
+          addCell();
+          if (items[i] === delimiters.row) row+=1;
+        }
+      }
+      addCell();
+      self.autocorrect();
+      return Parser.succeed(self);
+    });
+  };
+});
+
+// Replacement for mathblocks inside TabularEnv cells
+// Adds tabular-specific keyboard commands
+var TabularCell = P(MathBlock, function(_, super_) {
   _.init = function(row, parent, replaces) {
     super_.init.call(this);
     this.row = row;

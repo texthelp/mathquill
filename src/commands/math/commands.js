@@ -1388,7 +1388,6 @@ Environments['align*'] = P(TabularEnv, function(_, super_) {
   };
 });
 
-Environments.tabular = 
 Environments.array = P(TabularEnv, function(_, super_) {
   _.environment = 'array';
   _.removeEmptyColumns = false;
@@ -1405,6 +1404,23 @@ Environments.array = P(TabularEnv, function(_, super_) {
     ;
 
     return super_.html.call(this);
+  };
+  _.latex = function() {
+    var delimiters = this.delimiters;
+    var latex = '{' + this.cellAlignmentString + '}';
+    var row;
+
+    this.eachChild(function (cell) {
+      if (typeof row !== 'undefined') {
+        latex += (row !== cell.row) ?
+          delimiters.row :
+          delimiters.column;
+      }
+      row = cell.row;
+      latex += cell.latex();
+    });
+
+    return this.wrappers().join(latex);
   };
   _.getAlignment = function(cellNumber) {
     if(cellNumber < 0 || cellNumber > this.cellAlignment.length - 1) {
@@ -1502,6 +1518,7 @@ Environments.array = P(TabularEnv, function(_, super_) {
     .then(function(alignmentParameter) {
       // Store the cell alignment against the current environment
       // All rows will inherit this order
+      self.cellAlignmentString = alignmentParameter;
       self.cellAlignment = self.parseAlignment(alignmentParameter);
       return optWhitespace
         .then(string(self.delimiters.column)
@@ -1533,6 +1550,10 @@ Environments.array = P(TabularEnv, function(_, super_) {
       return Parser.succeed(self);
     });
   };
+});
+
+Environments.tabular = P(Environments.array, function(_, super_) {
+  _.environment = 'tabular';
 });
 
 // Replacement for mathblocks inside TabularEnv cells

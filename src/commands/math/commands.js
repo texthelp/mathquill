@@ -1223,23 +1223,13 @@ var TabularEnv = P(Environment, function(_, super_) {
     // Add new cells, one for each column
     for (var i=0; i<columns; i+=1) {
       block = TabularCell(row+1);
-      // If we're duplicating the previous row, we should
-      // create a clone of the children from that cell and append it to the current
-      if(duplicatePreviousRow === true) {
-        var fragment = latexMathParser.parse(previousRowCells[i].latex());
-        fragment.children().adopt(block, block.ends[L], 0);
-      }
+      isFirstColumn = false;
+      // Create cell <td>s and add to new row
+      var td = block.jQ = $('<td>');
       block.parent = this;
       newCells.push(block);
       if (this.htmlColumnSeparator && !isFirstColumn) {
         newRow.append($(this.htmlColumnSeparator));
-      }
-      isFirstColumn = false;
-      // Create cell <td>s and add to new row
-      var td = block.jQ = $('<td>');
-      // If we're duplicating the previous row, create the jQuery children
-      if(duplicatePreviousRow === true) {
-        td.append(fragment.jQize());
       }
       // Otherwise flag the cell as being empty
       else {
@@ -1250,10 +1240,30 @@ var TabularEnv = P(Environment, function(_, super_) {
       }
       td.attr(mqBlockId, block.id)
         .appendTo(newRow);
+
+      // Insert the new row
+      this.jQ.find('tr').eq(row).after(newRow);
+
+      // If we're duplicating the previous row, we should
+      // create a clone of the children from that cell and append it to the current
+      if(duplicatePreviousRow === true) {
+        var cursor = this.parent.cursor;
+        var all = Parser.all;
+        var eof = Parser.eof;
+        var fragment = latexMathParser.skip(eof).or(all.result(false)).parse(previousRowCells[i].latex());
+        if(!fragment.isEmpty()) {
+          td.removeClass("mq-empty");
+        }
+        fragment.children().adopt(block, 0, 0);
+        block.jQ.html(fragment.join("html"));
+        block.jQize(block.jQ.children());
+        fragment.finalizeInsert(cursor.options);
+        this.finalizeTree();
+        this.bubble('reflow');
+      }
     }
 
-    // Insert the new row
-    this.jQ.find('tr').eq(row).after(newRow);
+    
     this.blocks = previous.concat(newCells, next);
 ;    return newCells[column];
   };

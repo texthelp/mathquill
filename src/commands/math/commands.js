@@ -1384,7 +1384,6 @@ Environments.Vmatrix = P(Matrix, function(_, super_) {
 
 // An environment for aligning equations that translates well enough to amsmath align*.
 // Similar to matrix, but with a strict set of alignment rules
-Environments.aligned =
 Environments['align*'] = P(TabularEnv, function(_, super_) {
   _.environment = 'align*';
   _.removeEmptyColumns = true;
@@ -1403,6 +1402,10 @@ Environments['align*'] = P(TabularEnv, function(_, super_) {
 
     return super_.html.call(this);
   };
+});
+
+Environments.aligned = P(Environments['align*'], function(_, super_) {
+  _.environment = 'aligned';
 });
 
 Environments.array = P(TabularEnv, function(_, super_) {

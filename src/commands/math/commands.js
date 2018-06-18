@@ -1572,10 +1572,6 @@ Environments.array = P(TabularEnv, function(_, super_) {
   };
 });
 
-Environments.tabular = P(Environments.array, function(_, super_) {
-  _.environment = 'tabular';
-});
-
 // Replacement for mathblocks inside TabularEnv cells
 // Adds tabular-specific keyboard commands
 var TabularCell = P(MathBlock, function(_, super_) {

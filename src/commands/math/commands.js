@@ -1306,6 +1306,7 @@ Environments.matrix = P(TabularEnv, function(_, super_) {
   };
   _.reflow = function() {
     var blockjQ = this.jQ.children('table');
+    if(!blockjQ.length) return;
 
     var height = blockjQ.outerHeight()/+blockjQ.css('fontSize').slice(0,-2);
 

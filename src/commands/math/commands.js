@@ -1411,7 +1411,7 @@ Environments.aligned = P(Environments['align*'], function(_, super_) {
 
 Environments.array = P(TabularEnv, function(_, super_) {
   _.environment = 'array';
-  _.removeEmptyColumns = false;
+  _.removeEmptyColumns = true;
   _.createBlocks = function() {
     this.blocks = [
       TabularCell(0, this)

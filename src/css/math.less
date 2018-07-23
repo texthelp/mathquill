@@ -50,7 +50,7 @@
 
   .mq-text-mode {
     display: inline-block;
-    white-space: pre;  
+    white-space: pre;
   }
 
   .mq-text-mode.mq-hasCursor {
@@ -311,7 +311,7 @@
     display: block;
     text-align: center;
   }
-  
+
   .mq-hat-prefix {
     display: block;
     text-align: center;
@@ -360,6 +360,57 @@
     border-top-left-radius: 50% .3em;
     margin-top: 1px;
     padding-top: 0.15em;
+  }
+
+  .mq-cancel {
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 10 10'> <path d='M 10 0 L 0 10' fill='none' stroke='black' stroke-width='1' /></svg>");
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size: 100% 100%, auto;
+  }
+
+  .mq-longdiv { 
+    border-top: 1px solid black; 
+    padding: 3px 0 0 3px; 
+ 
+    &:before { 
+      content: ')'; 
+      padding-bottom: 2px; 
+      display: inline-block; 
+      margin: -4px 2px 0 -3px; 
+      position: relative; 
+      top: 0; 
+      -webkit-transform: scaleY(1.3); 
+      -ms-transform: scaleY(1.3); 
+      transform: scaleY(1.3); 
+    } 
+  }
+
+  .mq-stackrel {
+    display: -webkit-inline-box;
+    display: -moz-inline-box;
+    display: -ms-inline-flexbox;
+    display: -webkit-inline-flex;
+    display: inline-flex;
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    box-orient: vertical;
+    -moz-box-orient: vertical;
+    -moz-box-direction: normal;
+    box-direction: vertical;
+    -ms-flex-direction: column;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+
+    -webkit-box-align: center;
+    -moz-box-align: center;
+    box-align: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+
+    vertical-align: middle;
   }
 
   .mq-overarrow {
@@ -413,6 +464,85 @@
         content: '\27A4';
         visibility: visible; //must override .mq-editable-field.mq-empty:after
         text-align: right;
+      }
+    }
+  }
+
+  .mq-tabular {
+    vertical-align: middle;
+    margin-left: 0.1em;
+    margin-right: 0.1em;
+
+    table tbody td {
+      &.mq-array-align-l {
+        text-align: left;
+      }
+      &.mq-array-align-c {
+        text-align: center;
+      }
+      &.mq-array-align-r {
+        text-align: right;
+      }
+      &.mq-array-border-l {
+        border-left: 1px solid #000;
+      }
+      &.mq-array-border-r {
+        border-right: 1px solid #000;
+      }
+    }
+
+    /* In LaTeX environments, there is no border spacing
+     * so the borders join up.
+     */
+    &.mq-array-table {
+      table {
+        border-spacing: 0;
+        border-collapse: collapse;
+
+        /* In place of this, we add some more padding to the
+         * cells to give more space */
+        td {
+          padding: 0.3em 0.5em;
+        }
+      }
+    }
+
+    table {
+      width: auto;
+      border-bottom: none;
+      border-spacing: 3px;
+      border-collapse: separate;
+
+      &.mq-rows-1 { /* better alignment when there's just one row */
+        vertical-align: middle;
+        margin-bottom: 1px;
+      }
+
+      &.mq-align {
+        td:nth-child(odd) {
+          text-align: right;
+        }
+        td:nth-child(even) {
+          text-align: left;
+          min-width: 50px;
+        }
+      }
+    }
+
+    td {
+      border: none;
+      width: auto; /* defensive resets */
+      padding: 0.1em 0.3em;
+      vertical-align: baseline;
+    }
+
+    &.mq-align {
+      td:nth-child(odd) {
+        text-align: right;
+      }
+      td:nth-child(even) {
+        text-align: left;
+        min-width: 50px;
       }
     }
   }

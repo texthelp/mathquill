@@ -1,11 +1,15 @@
 {
   "name": "mathquill",
   "description": "Easily type math in your webapp",
-  "version": "0.10.1",
+  "version": "1.0.0-alpha.16",
+  "main": "build/mathquill.js",
   "license": "MPL-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mathquill/mathquill.git"
+    "url": "https://github.com/texthelp/mathquill.git"
+  },
+  "scripts": {
+    "prepublishOnly": "make all"
   },
   "files": [
     "build/mathquill.{css,js,min.js}",
@@ -16,6 +20,6 @@
     "pjs": ">=3.1.0 <5.0.0",
     "mocha": ">=2.4.1",
     "uglify-js": "2.x",
-    "less": ">=1.5.1"
+    "less": "^1.5.1"
   }
 }

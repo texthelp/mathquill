@@ -1627,32 +1627,23 @@ LatexCmds.hline = P(Symbol, function(_, super_) {
     var $tr = this.jQ.closest("tr");
     if($tr.length) {
       $tr.addClass("mq-row-has-border");
+      var $rows = $tr.find("td");
+      var $emptyRows = $rows.filter(function() {
+        return $(this).is(":empty") || ($(this).children().length === 1 && $(this).find("span.mq-hline").length === 1);
+      });
+      if($rows.length === $emptyRows.length) {
+        $tr.prev("tr").addClass("mq-row-has-bottom-border");
+        $tr.addClass("mq-row-hline-invisible");
+      } else {
+        $tr.prev("tr").removeClass("mq-row-has-bottom-border");
+        $tr.removeClass("mq-row-hline-invisible");
+      }
     }
   };
   _.deleteTowards = function(dir, cursor) {
     var $tr = this.jQ.closest("tr");
     if($tr.length) {
       $tr.removeClass("mq-row-has-border");
-    }
-    super_.deleteTowards.call(this, dir, cursor);
-  };
-});
-
-LatexCmds.bline = P(Symbol, function(_, super_) {
-  _.htmlTemplate = '<span class="mq-bline"></span>';
-  _.latex = function() {
-    return '\\\\hline';
-  };
-  _.finalizeTree = function() {
-    var $tr = this.jQ.closest("tr");
-    if($tr.length) {
-      $tr.addClass("mq-row-has-bottom-border");
-    }
-  };
-  _.deleteTowards = function(dir, cursor) {
-    var $tr = this.jQ.closest("tr");
-    if($tr.length) {
-      $tr.removeClass("mq-row-has-bottom-border");
     }
     super_.deleteTowards.call(this, dir, cursor);
   };

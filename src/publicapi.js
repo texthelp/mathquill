@@ -171,7 +171,23 @@ function getInterface(v) {
     };
     _.cmd = function(cmd) {
       var ctrlr = this.__controller.notify(), cursor = ctrlr.cursor;
-      if (/^\\[a-z]+$/i.test(cmd)) {
+      // Special case for textcolor/class
+      var isTextColor = /^\\(textcolor|class){(.*?)}/i;
+      if(isTextColor.test(cmd)) {
+        var multimatch = isTextColor.exec(cmd);
+        var klass = multimatch[1];
+        var cmd = LatexCmds[klass](klass);
+        if(klass === "textcolor") {
+          cmd.setColor(multimatch[2]);
+        } else if(klass === "class") {
+          cmd.setClass(multimatch[2]);
+        }
+        if (cursor.selection) cmd.replaces(cursor.replaceSelection());
+          cmd.createLeftOf(cursor.show());
+          this.__controller.scrollHoriz();
+        return this;
+      }
+      if (/^\\[a-z]+/i.test(cmd)) {
         cmd = cmd.slice(1);
         var klass = LatexCmds[cmd] || Environments[cmd];
         if (klass) {

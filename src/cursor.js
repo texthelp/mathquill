@@ -264,6 +264,12 @@ var Cursor = P(Point, function(_) {
 var Selection = P(Fragment, function(_, super_) {
   _.init = function() {
     super_.init.apply(this, arguments);
+    this.ends[L].bubble(function(ancestor) {
+      if(ancestor.controller) {
+        ancestor.controller.handle("selection-start");
+        return true;
+      }
+    });
     this.jQ = this.jQ.wrapAll('<span class="mq-selection"></span>').parent();
       //can't do wrapAll(this.jQ = $(...)) because wrapAll will clone it
   };
@@ -272,6 +278,12 @@ var Selection = P(Fragment, function(_, super_) {
     return super_.adopt.apply(this, arguments);
   };
   _.clear = function() {
+    this.ends[L].bubble(function(ancestor) {
+      if(ancestor.controller) {
+        ancestor.controller.handle("selection-end");
+        return true;
+      }
+    });
     // using the browser's native .childNodes property so that we
     // don't discard text nodes.
     this.jQ.replaceWith(this.jQ[0].childNodes);

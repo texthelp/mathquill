@@ -108,7 +108,12 @@ Controller.open(function(_) {
         text = '\\text{'+text+'}';
       }
     }
-    // FIXME: this always inserts math or a TextBlock, even in a RootTextBlock
-    this.writeLatex(text).cursor.show();
+    // If the user is in text mode, paste the raw text...
+    if(this.cursor && this.cursor.parent && this.cursor.parent.jQ.is(".mq-text-mode")) {
+      this.typedText(text);
+    } else {
+      // Otherwise paste as LaTeX
+      this.writeLatex(text).cursor.show();
+    }
   };
 });

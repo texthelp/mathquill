@@ -173,11 +173,29 @@ function getInterface(v) {
       var ctrlr = this.__controller.notify(), cursor = ctrlr.cursor;
       // Special case for textcolor/class
       var isTextColor = /^\\(textcolor|class){(.*?)}/i;
+      if(cursor && cursor.parent && cursor.parent.jQ.is(".mq-text-mode")) {
+        if(cmd === "\\text") {
+          // .cmd doesn't work inside text mode
+          cursor.clearSelection().show();
+          return this;
+        }
+        if(isTextColor.test(cmd)) {
+          cursor.parent.select();
+        }
+      }
+      
       if(isTextColor.test(cmd)) {
         var multimatch = isTextColor.exec(cmd);
         var klass = multimatch[1];
         var cmd = LatexCmds[klass](klass);
         if(klass === "textcolor") {
+          var left = cursor.selection && cursor.selection.ends[L];
+          var right = cursor.selection && cursor.selection.ends[R];
+          if(left && right && left === right && left.ctrlSeq === "textcolor") {
+            left.setColor(multimatch[2]);
+            left.jQ.css("color", multimatch[2]);
+            return this;
+          }
           cmd.setColor(multimatch[2]);
         } else if(klass === "class") {
           cmd.setClass(multimatch[2]);

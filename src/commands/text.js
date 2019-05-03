@@ -180,6 +180,12 @@ var TextBlock = P(Node, function(_, super_) {
 
     var textPcDom = self.jQ[0].firstChild;
     if (!textPcDom) return;
+    // Child could be a selection object. If that's the case,
+    // ignore the selection and get it's firstChild to compare on that
+    if(jQuery(textPcDom).is(".mq-selection")) {
+      textPcDom = textPcDom.firstChild;
+    }
+    if(!textPcDom) return;
     pray('only node in TextBlock span is Text node', textPcDom.nodeType === 3);
     // nodeType === 3 has meant a Text node since ancient times:
     //   http://reference.sitepoint.com/javascript/Node/nodeType

@@ -179,9 +179,6 @@ function getInterface(v) {
           cursor.clearSelection().show();
           return this;
         }
-        if(isTextColor.test(cmd)) {
-          cursor.parent.select();
-        }
       }
       
       if(isTextColor.test(cmd)) {

@@ -191,6 +191,7 @@ function getInterface(v) {
           if(left && right && left === right && left.ctrlSeq === "textcolor") {
             left.setColor(multimatch[2]);
             left.jQ.css("color", multimatch[2]);
+            ctrlr.handle("edit");
             return this;
           }
           cmd.setColor(multimatch[2]);

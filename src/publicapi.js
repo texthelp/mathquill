@@ -201,6 +201,7 @@ function getInterface(v) {
         if (cursor.selection) cmd.replaces(cursor.replaceSelection());
           cmd.createLeftOf(cursor.show());
           this.__controller.scrollHoriz();
+          ctrlr.handle("edit");
         return this;
       }
       if (/^\\[a-z]+/i.test(cmd)) {
@@ -216,6 +217,7 @@ function getInterface(v) {
       }
       else cursor.parent.write(cursor, cmd);
       if (ctrlr.blurred) cursor.hide().parent.blur();
+      ctrlr.handle("edit");
       return this;
     };
     _.select = function() {

@@ -1152,7 +1152,7 @@ var TabularEnv = P(Environment, function(_, super_) {
   };
   // Deleting a cell will also delete the current row and
   // column if they are empty, and relink the matrix.
-  _.deleteCell = function(currentCell) {
+  _.deleteCell = function(currentCell, forceRemove) {
     var rows = [], columns = [], myRow = [], myColumn = [];
     var blocks = this.blocks, row, column;
 
@@ -1202,7 +1202,7 @@ var TabularEnv = P(Environment, function(_, super_) {
       remove(myRow);
       this.jQ.find('tr').eq(row).remove();
     }
-    if (this.removeEmptyColumns && isEmpty(myColumn) && myRow.length > 1) {
+    if (forceRemove || (this.removeEmptyColumns && isEmpty(myColumn) && myRow.length > 1)) {
       remove(myColumn);
     }
     this.finalizeTree();
@@ -1613,6 +1613,9 @@ var TabularCell = P(MathBlock, function(_, super_) {
       break;
     case 'Shift-Enter':
       return this.parent.insert('addRow', this, ctrlr.cursor);
+      break;
+    case 'Shift-Backspace':
+      return this.parent.deleteCell(ctrlr.cursor.parent, true);
       break;
     case 'Ctrl-Shift-Enter':
       return this.parent.insert('duplicateRow', this, ctrlr.cursor);

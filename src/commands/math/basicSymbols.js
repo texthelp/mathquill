@@ -255,7 +255,7 @@ LatexCmds.f = P(Letter, function(_, super_) {
 
 // VanillaSymbol's
 LatexCmds[' '] = LatexCmds.space = bind(VanillaSymbol, '\\ ', '&nbsp;');
-
+LatexCmds['#'] = LatexCmds.space = bind(VanillaSymbol, '\\#', '#');
 LatexCmds["'"] = LatexCmds.prime = bind(VanillaSymbol, "\\prime", '&prime;');
 LatexCmds['″'] = LatexCmds.dprime = bind(VanillaSymbol, '″', '&Prime;');
 

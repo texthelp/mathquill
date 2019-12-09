@@ -37,7 +37,7 @@ CharCmds['\\'] = P(MathCommand, function(_, super_) {
       }
     };
     this.ends[L].keystroke = function(key, e, ctrlr) {
-      if (key === 'Tab' || key === 'Enter' || key === 'Spacebar') {
+      if (key === 'Enter' || key === 'Spacebar') {
         this.parent.renderCommand(ctrlr.cursor);
         e.preventDefault();
         return;

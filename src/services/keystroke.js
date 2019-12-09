@@ -26,12 +26,10 @@ Node.open(function(_) {
 
     // Tab or Esc -> go one block right if it exists, else escape right.
     case 'Esc':
-    case 'Tab':
       ctrlr.escapeDir(R, key, e);
       return;
 
     // Shift-Tab -> go one block left if it exists, else escape left.
-    case 'Shift-Tab':
     case 'Shift-Esc':
       ctrlr.escapeDir(L, key, e);
       return;

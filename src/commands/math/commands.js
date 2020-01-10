@@ -1240,7 +1240,7 @@ var TabularEnv = P(Environment, function(_, super_) {
     // Add new cells, one for each column
     for (var i=0; i<columns; i+=1) {
       block = TabularCell(row+1);
-      isFirstColumn = false;
+      var isFirstColumn = false;
       // Create cell <td>s and add to new row
       var td = block.jQ = $('<td>');
       block.parent = this;

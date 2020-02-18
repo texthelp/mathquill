@@ -256,7 +256,7 @@ LatexCmds.f = P(Letter, function(_, super_) {
 // VanillaSymbol's
 LatexCmds[' '] = LatexCmds.space = bind(VanillaSymbol, '\\ ', '&nbsp;');
 LatexCmds['#'] = LatexCmds.space = bind(VanillaSymbol, '\\#', '#');
-LatexCmds["'"] = LatexCmds.prime = bind(VanillaSymbol, "^{\\prime}", '&prime;');
+LatexCmds.prime = bind(VanillaSymbol, "\\prime", '&prime;');
 LatexCmds['″'] = LatexCmds.dprime = bind(VanillaSymbol, '″', '&Prime;');
 
 LatexCmds.backslash = bind(VanillaSymbol,'\\backslash ','\\');
@@ -421,6 +421,7 @@ var LatexFragment = P(MathCommand, function(_) {
 // [2]: http://en.wikipedia.org/wiki/Number_Forms
 // [3]: http://en.wikipedia.org/wiki/ISO/IEC_8859-1
 // [4]: http://en.wikipedia.org/wiki/Windows-1252
+LatexCmds["'"] = bind(LatexFragment, '^\\prime');
 LatexCmds['¹'] = bind(LatexFragment, '^1');
 LatexCmds['²'] = bind(LatexFragment, '^2');
 LatexCmds['³'] = bind(LatexFragment, '^3');

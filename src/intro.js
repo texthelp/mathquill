@@ -10,7 +10,7 @@
 
 (function() {
 
-var jQuery = window.jQuery,
+var jQuery = $jQuery || {},
   undefined,
   mqCmdId = 'mathquill-command-id',
   mqBlockId = 'mathquill-block-id',

@@ -9,9 +9,7 @@
     "url": "https://github.com/texthelp/mathquill.git"
   },
   "scripts": {
-    "prepublishOnly": "npm run docker-build",
-    "docker-create": "docker build -t mathquill .",
-    "docker-build": "npx cross-var docker run --rm -v $init_cwd:/src mathquill:latest /bin/sh -c \"cd /src && make all\""
+    "prepublishOnly": "make clean && make all"
   },
   "files": [
     "build/mathquill.{css,js,min.js}",
@@ -25,5 +23,8 @@
     "mocha": ">=2.4.1",
     "pjs": ">=3.1.0 <5.0.0",
     "uglify-js": "2.x"
+  },
+  "dependencies": {
+    "jquery": "^3.4.1"
   }
 }

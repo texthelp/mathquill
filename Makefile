@@ -123,6 +123,10 @@ $(BUILD_JS): $(INTRO) $(SOURCES_FULL) $(OUTRO) $(BUILD_DIR_EXISTS)
 
 $(UGLY_JS): $(BUILD_JS) $(NODE_MODULES_INSTALLED)
 	$(UGLIFY) $(UGLIFY_OPTS) < $< > $@
+	sed -i '1s/^/import $$jQuery from "jquery"\n\n/' $(UGLY_JS)
+	sed -i '1s/^/import $$jQuery from "jquery"\n\n/' $(BUILD_JS)
+	echo '\n\nexport default MathQuill;' >> $(BUILD_JS)
+	echo '\n\nexport default MathQuill;' >> $(UGLY_JS)
 
 $(BASIC_JS): $(INTRO) $(SOURCES_BASIC) $(OUTRO) $(BUILD_DIR_EXISTS)
 	cat $^ | ./script/escape-non-ascii > $@

@@ -25,7 +25,7 @@ LatexCmds.because = bind(BinaryOperator,'\\because ','&#8757;');
 
 LatexCmds.prop = LatexCmds.propto = bind(BinaryOperator,'\\propto ','&prop;');
 
-LatexCmds['≈'] = LatexCmds.approx = bind(BinaryOperator,'\\approx ');
+LatexCmds['≈'] = LatexCmds.approx = bind(BinaryOperator,'\\approx ', '&asymp;');
 
 LatexCmds.asymp = bind(BinaryOperator, '\\asymp', '&#x224D;');
 

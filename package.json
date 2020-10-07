@@ -9,7 +9,8 @@
     "url": "https://github.com/texthelp/mathquill.git"
   },
   "scripts": {
-    "prepublishOnly": "make clean && make all"
+    "prepublishOnly": "make clean && make all",
+    "demo": "npx http-server . -p 8093 -c-1 -o"
   },
   "files": [
     "build/mathquill.{css,js,min.js}",

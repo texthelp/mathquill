@@ -458,6 +458,21 @@ LatexCmds.integral = P(SummationNotation, function(_, super_) {
   _.createLeftOf = MathCommand.p.createLeftOf;
 });
 
+LatexCmds['lim'] = P(SummationNotation, function(_, super_) {
+  _.init = function() {
+    var htmlTemplate =
+      '<span class="mq-stackrel mq-non-leaf">'
+    +   '<span class="mq-supsub mq-non-leaf">'
+    +     '<span class="mq-sup" style="text-align: center"><span class="mq-sup-inner">lim</span></span>'
+    +     '<span class="mq-sub" style="text-align: center">&0</span>'
+    +     '<span style="display:inline-block;width:0">&#8203</span>'
+    +   '</span>'
+    + '</span>'
+    ;
+    Symbol.prototype.init.call(this, '\\lim ', htmlTemplate);
+  };
+});
+
 var Fraction =
 LatexCmds.frac =
 LatexCmds.dfrac =

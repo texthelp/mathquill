@@ -1044,7 +1044,7 @@ var TabularEnv = P(Environment, function(_, super_) {
     this.eachChild(function (cell) {
       if (typeof row !== 'undefined') {
         latex += (row !== cell.row) ?
-          delimiters.row :
+          delimiters.row + "\r\n" :
           delimiters.column;
       }
       row = cell.row;
@@ -1518,7 +1518,7 @@ Environments.array = P(TabularEnv, function(_, super_) {
     this.eachChild(function (cell) {
       if (typeof row !== 'undefined') {
         latex += (row !== cell.row) ?
-          delimiters.row :
+          delimiters.row + "\r\n":
           delimiters.column;
       }
       row = cell.row;

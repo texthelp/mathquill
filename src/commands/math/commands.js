@@ -1028,8 +1028,11 @@ var TabularEnv = P(Environment, function(_, super_) {
     }
 
     // Add cell <td> elements in correct positions
-    this.jQ.find('tr').each(function (i) {
-      $(this).find('td').eq(column-1).after(rows[i][column].jQ);
+    // Only want the first table <tr> nodes as it causes issues
+    // with a matrix in a array etc
+    this.jQ.find("tbody").first().children().filter("tr").each(function (i) {
+      // children used again to avoid problems with nested tabular environments
+      $(this).children().filter("td").eq(column-1).after(rows[i][column].jQ);
     });
 
     // Flatten the rows array-of-arrays
@@ -1267,7 +1270,7 @@ var TabularEnv = P(Environment, function(_, super_) {
       });
       // Dispose of cells and remove <tr>
       remove(myRow);
-      this.jQ.find('tr').eq(row).remove();
+      this.jQ.find("tbody").first().children().filter("tr").eq(row).remove();
     }
     if (forceRemove || (this.removeEmptyColumns && isEmpty(myColumn) && myRow.length > 1)) {
       remove(myColumn);
@@ -1326,7 +1329,8 @@ var TabularEnv = P(Environment, function(_, super_) {
         .appendTo(newRow);
 
       // Insert the new row
-      this.jQ.find('tr').eq(row).after(newRow);
+      // Grabbing tbody because you can have nested <tr>
+      this.jQ.find("tbody").first().children().filter("tr").eq(row).after(newRow);
 
       // If we're duplicating the previous row, we should
       // create a clone of the children from that cell and append it to the current

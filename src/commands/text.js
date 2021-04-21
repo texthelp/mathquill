@@ -68,11 +68,9 @@ var TextBlock = P(Node, function(_, super_) {
     return '\\text{' + contents.replace(/\\/g, '\\backslash ').replace(/[{}]/g, '\\$&') + '}';
   };
   _.html = function() {
-    return (
-        '<span class="mq-text-mode" mathquill-command-id='+this.id+'>'
-      +   this.textContents()
-      + '</span>'
-    );
+    var $template = jQuery('<span class="mq-text-mode" mathquill-command-id='+this.id+'></span>');
+    $template.text(this.textContents());
+    return $template[0].outerHTML;
   };
 
   // editability methods: called by the cursor for editing, cursor movements,
